@@ -4,7 +4,7 @@ class Articulos extends CI_Controller
 {
     public function index()
     {
-        $data['filas'] = $this->db->query('select * from articulos')->result_array();
+        $data['filas'] = $this->Articulo->todos();
         $this->load->view('articulos/index', $data);
     }
 
@@ -15,7 +15,7 @@ class Articulos extends CI_Controller
             $id = $this->input->post('id');
             if ($id !== NULL)
             {
-                $this->db->query("delete from articulos where id = ?", array($id));
+                $this->Articulo->borrar($id);
             }
             redirect('articulos/index');
         }
@@ -27,14 +27,14 @@ class Articulos extends CI_Controller
             }
             else
             {
-                $res = $this->db->query('select * from articulos where id = ?', array($id));
-                if ($res->num_rows() === 0)
+                $res = $this->Articulo->por_id($id);
+                if ($res === FALSE)
                 {
                     redirect('articulos/index');
                 }
                 else
                 {
-                    $data = $res->row_array();
+                    $data = $res;
                     $this->load->view('articulos/borrar', $data);
                 }
             }
