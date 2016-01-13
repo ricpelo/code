@@ -7,16 +7,17 @@
     <body>
         <table border="1">
             <thead>
-                <td>Id</td>
                 <td>Código</td>
                 <td>Descripción</td>
+                <td>Acciones</td>
             </thead>
             <tbody>
                 <?php foreach ($filas as $fila): ?>
                     <tr>
-                        <td><?= $fila['id'] ?></td>
                         <td><?= $fila['codigo'] ?></td>
                         <td><?= $fila['descripcion'] ?></td>
+                        <td><?= anchor('/articulos/borrar/' . $fila['id'],
+                                       'Borrar') ?></td>
                     </tr>
                 <?php endforeach ?>
             </tbody>
