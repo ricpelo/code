@@ -17,10 +17,13 @@
                         <td><?= $fila['codigo'] ?></td>
                         <td><?= $fila['descripcion'] ?></td>
                         <td><?= anchor('/articulos/borrar/' . $fila['id'],
-                                       'Borrar') ?></td>
+                                       form_button('borrar', 'Borrar')) ?></td>
                     </tr>
                 <?php endforeach ?>
             </tbody>
         </table>
+        <p>
+            <?= anchor('articulos/insertar', form_button('insertar', 'Insertar')) ?>
+        </p>
     </body>
 </html>
