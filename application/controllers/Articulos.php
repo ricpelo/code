@@ -16,7 +16,10 @@ class Articulos extends CI_Controller
                 array(
                     'field' => 'codigo',
                     'label' => 'Código',
-                    'rules' => 'trim|required|numeric|max_length[13]'
+                    'rules' => 'trim|required|ctype_digit|max_length[13]|is_unique[articulos.codigo]',
+                    'errors' => array(
+                        'ctype_digit' => 'El campo %s debe contener sólo dígitos.'
+                    )
                 ),
                 array(
                     'field' => 'descripcion',
@@ -26,31 +29,69 @@ class Articulos extends CI_Controller
                 array(
                     'field' => 'precio',
                     'label' => 'Precio',
-                    'rules' => 'trim|required|decimal|less_than_equal_to[9999.99]'
+                    'rules' => 'trim|required|numeric|less_than_equal_to[9999.99]'
                 ),
                 array(
                     'field' => 'existencias',
                     'label' => 'Existencias',
-                    'rules' => 'trim|integer|greather_than_equal_to[-2147483648]|less_than_equal_to[+2147483647]'
+                    'rules' => 'trim|integer|greater_than_equal_to[-2147483648]|less_than_equal_to[+2147483647]'
                 )
             );
             $this->form_validation->set_rules($reglas);
-            if ($this->form_validation->run() === FALSE)
-            {
-                $this->load->view('articulos/insertar');
-            }
-            else
+            if ($this->form_validation->run() !== FALSE)
             {
                 $valores = $this->input->post();
                 unset($valores['insertar']);
                 $this->Articulo->insertar($valores);
                 redirect('articulos/index');
+                return;
             }
         }
-        else
+        $this->load->view('articulos/insertar');
+    }
+
+    public function editar($id = NULL)
+    {
+        if ($this->input->post('editar') !== NULL)
         {
-            $this->load->view('articulos/insertar');
+            $reglas = array(
+                array(
+                    'field' => 'codigo',
+                    'label' => 'Código',
+                    'rules' => 'trim|required|ctype_digit|max_length[13]|is_unique[articulos.codigo]',
+                    'errors' => array(
+                        'ctype_digit' => 'El campo %s debe contener sólo dígitos.'
+                    )
+                ),
+                array(
+                    'field' => 'descripcion',
+                    'label' => 'Descripción',
+                    'rules' => 'trim|required|max_length[50]'
+                ),
+                array(
+                    'field' => 'precio',
+                    'label' => 'Precio',
+                    'rules' => 'trim|required|numeric|less_than_equal_to[9999.99]'
+                ),
+                array(
+                    'field' => 'existencias',
+                    'label' => 'Existencias',
+                    'rules' => 'trim|integer|greater_than_equal_to[-2147483648]|less_than_equal_to[+2147483647]'
+                )
+            );
+            $this->form_validation->set_rules($reglas);
+            if ($this->form_validation->run() !== FALSE)
+            {
+                $valores = $this->input->post();
+                unset($valores['editar']);
+                $this->Articulo->editar($valores);
+                redirect('articulos/index');
+                return;
+            }
         }
+        $valores = $this->Articulo->por_id($id);
+        $data = $valores;
+        $this->load->view('articulos/editar', $data);
     }
 
     public function borrar($id = NULL)
