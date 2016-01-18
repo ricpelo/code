@@ -2,6 +2,32 @@
 
 class Articulos extends CI_Controller
 {
+    private $reglas_comunes = array(
+        array(
+            'field' => 'codigo',
+            'label' => 'Código',
+            'rules' => 'trim|required|ctype_digit|max_length[13]',
+            'errors' => array(
+                'ctype_digit' => 'El campo %s debe contener sólo dígitos.'
+            )
+        ),
+        array(
+            'field' => 'descripcion',
+            'label' => 'Descripción',
+            'rules' => 'trim|required|max_length[50]'
+        ),
+        array(
+            'field' => 'precio',
+            'label' => 'Precio',
+            'rules' => 'trim|required|numeric|less_than_equal_to[9999.99]'
+        ),
+        array(
+            'field' => 'existencias',
+            'label' => 'Existencias',
+            'rules' => 'trim|integer|greater_than_equal_to[-2147483648]|less_than_equal_to[+2147483647]'
+        )
+    );
+
     public function index()
     {
         $data['filas'] = $this->Articulo->todos();
@@ -12,36 +38,12 @@ class Articulos extends CI_Controller
     {
         if ($this->input->post('insertar') !== NULL)
         {
-            $reglas = array(
-                array(
-                    'field' => 'codigo',
-                    'label' => 'Código',
-                    'rules' => 'trim|required|ctype_digit|max_length[13]|is_unique[articulos.codigo]',
-                    'errors' => array(
-                        'ctype_digit' => 'El campo %s debe contener sólo dígitos.'
-                    )
-                ),
-                array(
-                    'field' => 'descripcion',
-                    'label' => 'Descripción',
-                    'rules' => 'trim|required|max_length[50]'
-                ),
-                array(
-                    'field' => 'precio',
-                    'label' => 'Precio',
-                    'rules' => 'trim|required|numeric|less_than_equal_to[9999.99]'
-                ),
-                array(
-                    'field' => 'existencias',
-                    'label' => 'Existencias',
-                    'rules' => 'trim|integer|greater_than_equal_to[-2147483648]|less_than_equal_to[+2147483647]'
-                )
-            );
+            $reglas = $this->reglas_comunes;
+            $reglas[0]['rules'] .= '|is_unique[articulos.codigo]';
             $this->form_validation->set_rules($reglas);
             if ($this->form_validation->run() !== FALSE)
             {
-                $valores = $this->input->post();
-                unset($valores['insertar']);
+                $valores = $this->limpiar('insertar', $this->input->post());
                 $this->Articulo->insertar($valores);
                 redirect('articulos/index');
             }
@@ -60,36 +62,12 @@ class Articulos extends CI_Controller
 
         if ($this->input->post('editar') !== NULL)
         {
-            $reglas = array(
-                array(
-                    'field' => 'codigo',
-                    'label' => 'Código',
-                    'rules' => "trim|required|ctype_digit|max_length[13]|callback__codigo_unico[$id]",
-                    'errors' => array(
-                        'ctype_digit' => 'El campo %s debe contener sólo dígitos.'
-                    )
-                ),
-                array(
-                    'field' => 'descripcion',
-                    'label' => 'Descripción',
-                    'rules' => 'trim|required|max_length[50]'
-                ),
-                array(
-                    'field' => 'precio',
-                    'label' => 'Precio',
-                    'rules' => 'trim|required|numeric|less_than_equal_to[9999.99]'
-                ),
-                array(
-                    'field' => 'existencias',
-                    'label' => 'Existencias',
-                    'rules' => 'trim|integer|greater_than_equal_to[-2147483648]|less_than_equal_to[+2147483647]'
-                )
-            );
+            $reglas = $this->reglas_comunes;
+            $reglas[0]['rules'] .= "|callback__codigo_unico[$id]";
             $this->form_validation->set_rules($reglas);
             if ($this->form_validation->run() !== FALSE)
             {
-                $valores = $this->input->post();
-                unset($valores['editar']);
+                $valores = $this->limpiar('editar', $this->input->post());
                 $this->Articulo->editar($valores, $id);
                 redirect('articulos/index');
             }
@@ -150,5 +128,16 @@ class Articulos extends CI_Controller
                 'El {field} debe ser único.');
             return FALSE;
         }
+    }
+
+    private function limpiar($accion, $valores)
+    {
+        unset($valores[$accion]);
+        if ($valores['existencias'] === '')
+        {
+            $valores['existencias'] = NULL;
+        }
+
+        return $valores;
     }
 }
