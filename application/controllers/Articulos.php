@@ -44,7 +44,6 @@ class Articulos extends CI_Controller
                 unset($valores['insertar']);
                 $this->Articulo->insertar($valores);
                 redirect('articulos/index');
-                return;
             }
         }
         $this->load->view('articulos/insertar');
@@ -52,13 +51,20 @@ class Articulos extends CI_Controller
 
     public function editar($id = NULL)
     {
+        if ($id === NULL)
+        {
+            redirect('articulos/index');
+        }
+
+        $id = trim($id);
+
         if ($this->input->post('editar') !== NULL)
         {
             $reglas = array(
                 array(
                     'field' => 'codigo',
                     'label' => 'Código',
-                    'rules' => 'trim|required|ctype_digit|max_length[13]|is_unique[articulos.codigo]',
+                    'rules' => "trim|required|ctype_digit|max_length[13]|callback__codigo_unico[$id]",
                     'errors' => array(
                         'ctype_digit' => 'El campo %s debe contener sólo dígitos.'
                     )
@@ -84,12 +90,15 @@ class Articulos extends CI_Controller
             {
                 $valores = $this->input->post();
                 unset($valores['editar']);
-                $this->Articulo->editar($valores);
+                $this->Articulo->editar($valores, $id);
                 redirect('articulos/index');
-                return;
             }
         }
         $valores = $this->Articulo->por_id($id);
+        if ($valores === FALSE)
+        {
+            redirect('articulos/index');
+        }
         $data = $valores;
         $this->load->view('articulos/editar', $data);
     }
@@ -124,6 +133,22 @@ class Articulos extends CI_Controller
                     $this->load->view('articulos/borrar', $data);
                 }
             }
+        }
+    }
+
+    public function _codigo_unico($codigo, $id)
+    {
+        $res = $this->Articulo->por_codigo($codigo);
+
+        if ($res === FALSE || $res['id'] === $id)
+        {
+            return TRUE;
+        }
+        else
+        {
+            $this->form_validation->set_message('_codigo_unico',
+                'El {field} debe ser único.');
+            return FALSE;
         }
     }
 }
