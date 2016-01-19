@@ -31,7 +31,8 @@ class Articulos extends CI_Controller
     public function index()
     {
         $data['filas'] = $this->Articulo->todos();
-        $this->load->view('articulos/index', $data);
+        $this->template->load('articulos/index', $data,
+                              array('title' => 'Listado de artículos'));
     }
 
     public function insertar()
@@ -48,7 +49,7 @@ class Articulos extends CI_Controller
                 redirect('articulos/index');
             }
         }
-        $this->load->view('articulos/insertar');
+        $this->template->load('articulos/insertar');
     }
 
     public function editar($id = NULL)
@@ -78,7 +79,7 @@ class Articulos extends CI_Controller
             redirect('articulos/index');
         }
         $data = $valores;
-        $this->load->view('articulos/editar', $data);
+        $this->template->load('articulos/editar', $data);
     }
 
     public function borrar($id = NULL)
@@ -108,7 +109,7 @@ class Articulos extends CI_Controller
                 else
                 {
                     $data = $res;
-                    $this->load->view('articulos/borrar', $data);
+                    $this->template->load('articulos/borrar', $data);
                 }
             }
         }
