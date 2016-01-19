@@ -2,11 +2,20 @@
 
 class Template
 {
+    public $data_template = array();
+
+    public function set($clave, $valor)
+    {
+        $this->data_template[$clave] = $valor;
+    }
+
     public function load($vista, $data = array(), $data_template = array(),
                          $template = 'template')
     {
         $CI =& get_instance();
-        $data_template['contents'] = $CI->load->view($vista, $data, TRUE);
-        $CI->load->view($template, $data_template);
+        $this->data_template['contents'] = $CI->load->view($vista, $data, TRUE);
+        $this->data_template = array_merge($this->data_template,
+                                           $data_template);
+        $CI->load->view($template, $this->data_template);
     }
 }
