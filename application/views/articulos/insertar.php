@@ -1,3 +1,4 @@
+<?php template_set('title', 'Insertar un artículo') ?>
 <?= validation_errors() ?>
 <?= form_open('articulos/insertar') ?>
     <?= form_label('Código:', 'codigo') ?>

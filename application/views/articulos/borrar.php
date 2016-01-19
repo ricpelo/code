@@ -1,3 +1,4 @@
+<?php template_set('title', 'Borrar un artículo') ?>
 <h3>¿Seguro que desea borrar el siguiente artículo?</h3>
 <p>(<?= $codigo ?>) <?= $descripcion ?></p>
 <?= form_open('articulos/borrar') ?>
