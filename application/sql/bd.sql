@@ -12,13 +12,19 @@ drop table if exists usuarios cascade;
 create table usuarios (
     id       bigserial   constraint pk_usuarios primary key,
     nick     varchar(15) not null constraint uq_usuarios_nick unique,
-    password char(32)    not null constraint ck_password_valida
-                         check (length(password) = 32),
+    password char(60)    not null constraint ck_password_valida
+                         check (length(password) = 60),
     rol_id   bigint      not null constraint fk_usuarios_roles
                          references roles (id) on delete no action
                          on update cascade
 );
- 
+
+drop view if exists usuarios_roles cascade;
+
+create view usuarios_roles as
+select u.*, descripcion
+  from usuarios u join roles r on rol_id = r.id;
+
 drop table if exists clientes cascade;
 
 create table clientes (
@@ -33,7 +39,7 @@ create table clientes (
                                check (length(codigo_postal) = 5),
     usuario_id    bigint       not null constraint fk_clientes_usuarios
                                references usuarios (id)
-                               on delete set null on update cascade
+                               on delete cascade on update cascade
 );
 
 drop table if exists articulos cascade;
@@ -82,4 +88,3 @@ create table lineas_pedidos (
     descripcion varchar(50),
     precio      numeric(6,2) not null
 );
-
