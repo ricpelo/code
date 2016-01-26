@@ -21,9 +21,55 @@ class Usuarios extends CI_Controller
         array(
             'field' => 'rol_id',
             'label' => 'Rol',
-            'rules' => 'trim|callback__existe_rol'
+            'rules' => 'trim|is_natural|callback__existe_rol'
         )
     );
+
+    public function login()
+    {
+        if ($this->input->post('login') !== NULL)
+        {
+            $nick = $this->input->post('nick');
+
+            $reglas = array(
+                array(
+                    'field' => 'nick',
+                    'label' => 'Nick',
+                    'rules' => array(
+                        'trim', 'required',
+                        array('existe_nick', array($this->Usuario, 'existe_nick'))
+                    ),
+                    'errors' => array(
+                        'existe_nick' => 'El nick debe existir.',
+                    ),
+                ),
+                array(
+                    'field' => 'password',
+                    'label' => 'Contraseña',
+                    'rules' => "trim|required|callback__password_valido[$nick]"
+                )
+            );
+
+            $this->form_validation->set_rules($reglas);
+            if ($this->form_validation->run() === TRUE)
+            {
+                $usuario = $this->Usuario->por_nick($nick);
+                $this->session->set_userdata('usuario', array(
+                    'id' => $usuario['id'],
+                    'nick' => $nick,
+                    'rol_id' => $usuario['rol_id']
+                ));
+                redirect('usuarios/index');
+            }
+        }
+        $this->template->load('usuarios/login');
+    }
+
+    public function logout()
+    {
+        $this->session->sess_destroy();
+        redirect('usuarios/login');
+    }
 
     public function index()
     {
@@ -41,7 +87,7 @@ class Usuarios extends CI_Controller
             if ($this->form_validation->run() !== FALSE)
             {
                 $valores = $this->limpiar('insertar', $this->input->post());
-                $this->Articulo->insertar($valores);
+                $this->Usuario->insertar($valores);
                 redirect('usuarios/index');
             }
         }
@@ -126,13 +172,28 @@ class Usuarios extends CI_Controller
         }
     }
 
+    public function _password_valido($password, $nick)
+    {
+        $usuario = $this->Usuario->por_nick($nick);
+
+        if ($usuario !== FALSE &&
+            password_verify($password, $usuario['password']) === TRUE)
+        {
+            return TRUE;
+        }
+        else
+        {
+            $this->form_validation->set_message('_password_valido',
+                'La {field} no es válida.');
+            return FALSE;
+        }
+    }
+
     private function limpiar($accion, $valores)
     {
         unset($valores[$accion]);
-        if ($valores['existencias'] === '')
-        {
-            $valores['existencias'] = NULL;
-        }
+        $valores['password'] = password_hash($valores['password'], PASSWORD_DEFAULT);
+        unset($valores['password_confirm']);
 
         return $valores;
     }
