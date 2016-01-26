@@ -88,3 +88,14 @@ create table lineas_pedidos (
     descripcion varchar(50),
     precio      numeric(6,2) not null
 );
+
+drop table if exists ci_sessions cascade;
+
+create table "ci_sessions" (
+    "id" varchar(40) not null primary key,
+    "ip_address" varchar(45) not null,
+    "timestamp" bigint default 0 not null,
+    "data" text default '' not null
+);
+
+create index "ci_sessions_timestamp" on "ci_sessions" ("timestamp");
