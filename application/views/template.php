@@ -17,9 +17,11 @@
         <![endif]-->
     </head>
     <body>
-        <?= login() ?>
-        <?= mensaje() ?>
-        <?= $contents ?>
+        <div class="container-fluid" style="padding-top: 20px">
+          <?= login() ?>
+          <?= mensaje() ?>
+          <?= $contents ?>
+        </div>
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script src="<?= base_url('assets/js/jquery-2.2.0.min.js') ?>"></script>
         <!-- Latest compiled and minified JavaScript -->
