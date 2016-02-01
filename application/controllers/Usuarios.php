@@ -25,8 +25,34 @@ class Usuarios extends CI_Controller
         )
     );
 
+    public function __construct()
+    {
+        parent::__construct();
+        $accion = $this->uri->rsegment(2);
+
+        if ($accion !== 'login' && ! $this->Usuario->logueado())
+        {
+            redirect('usuarios/login');
+        }
+
+        if ( ! in_array($accion, array('login', 'logout')))
+        {
+            if ( ! $this->Usuario->es_admin())
+            {
+                $this->session->set_flashdata('mensaje',
+                    'No tiene permisos para acceder a este módulo.');
+                redirect('articulos/index');
+            }
+        }
+    }
+
     public function login()
     {
+        if ($this->Usuario->logueado())
+        {
+            redirect('usuarios/index');
+        }
+
         if ($this->input->post('login') !== NULL)
         {
             $nick = $this->input->post('nick');

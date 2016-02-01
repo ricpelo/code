@@ -28,11 +28,21 @@ class Articulos extends CI_Controller
         )
     );
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        if ( ! $this->Usuario->logueado())
+        {
+            redirect('usuarios/login');
+        }
+
+    }
+
     public function index()
     {
         $data['filas'] = $this->Articulo->todos();
-        $this->template->load('articulos/index', $data,
-                              array('title' => 'Listado de artículos'));
+        $this->template->load('articulos/index', $data);
     }
 
     public function insertar()

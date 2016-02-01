@@ -18,6 +18,7 @@
     </head>
     <body>
         <?= login() ?>
+        <?= mensaje() ?>
         <?= $contents ?>
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script src="<?= base_url('assets/js/jquery-2.2.0.min.js') ?>"></script>
