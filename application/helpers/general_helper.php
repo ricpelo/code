@@ -9,8 +9,12 @@ function mensaje()
 
     if ($mensaje !== NULL)
     {
-        $out .= '<div class="alert alert-danger" role="alert">';
-          $out .= $mensaje;
+        $out .= '<div class="row">';
+          $out .= '<div class="col-md-8 col-md-offset-2">';
+            $out .= '<div class="alert alert-danger" role="alert">';
+              $out .= $mensaje;
+            $out .= '</div>';
+          $out .= '</div>';
         $out .= '</div>';
     }
 

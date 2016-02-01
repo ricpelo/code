@@ -40,7 +40,7 @@ class Usuarios extends CI_Controller
             if ( ! $this->Usuario->es_admin())
             {
                 $this->session->set_flashdata('mensaje',
-                    'No tiene permisos para acceder a este módulo.');
+                    "No tiene permisos para acceder a $accion.");
                 redirect('articulos/index');
             }
         }
