@@ -49,4 +49,11 @@ class Usuario extends CI_Model
     {
         return $this->db->where('id', $id)->update('usuarios', $valores);
     }
+
+    public function password($id)
+    {
+        $res = $this->db->query('select password from usuarios where id = ?',
+                                array($id));
+        return $res->num_rows() > 0 ? $res->row_array() : FALSE;
+    }
 }

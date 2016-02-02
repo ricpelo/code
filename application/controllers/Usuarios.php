@@ -25,6 +25,12 @@ class Usuarios extends CI_Controller
         )
     );
 
+    private $array_password_anterior = array(
+        'field' => 'password_anterior',
+        'label' => 'Contraseña Antigua',
+        'rules' => 'required'
+    );
+
     public function __construct()
     {
         parent::__construct();
@@ -133,7 +139,7 @@ class Usuarios extends CI_Controller
     {
         if ($id === NULL)
         {
-            redirect('articulos/index');
+            redirect('usuarios/index');
         }
 
         $id = trim($id);
@@ -141,22 +147,29 @@ class Usuarios extends CI_Controller
         if ($this->input->post('editar') !== NULL)
         {
             $reglas = $this->reglas_comunes;
-            $reglas[0]['rules'] .= "|callback__codigo_unico[$id]";
+            $reglas[0]['rules'] .= "|callback__nick_unico[$id]";
+            $reglas[] = $this->array_password_anterior;
+            $reglas[sizeof($reglas)-1]['rules'] .= "|callback__password_anterior_correcto[$id]";
             $this->form_validation->set_rules($reglas);
             if ($this->form_validation->run() !== FALSE)
             {
                 $valores = $this->limpiar('editar', $this->input->post());
-                $this->Articulo->editar($valores, $id);
-                redirect('articulos/index');
+                $this->Usuario->editar($valores, $id);
+                redirect('usuarios/index');
             }
         }
-        $valores = $this->Articulo->por_id($id);
+        $valores = $this->Usuario->por_id($id);
         if ($valores === FALSE)
         {
-            redirect('articulos/index');
+            redirect('usuarios/index');
         }
         $data = $valores;
-        $this->template->load('articulos/editar', $data);
+        if (isset($data['password']))
+        {
+            unset($data['password']);
+        }
+        $data['roles'] = $this->Rol->lista();
+        $this->template->load('usuarios/editar', $data);
     }
 
     public function borrar($id = NULL)
@@ -223,12 +236,46 @@ class Usuarios extends CI_Controller
         }
     }
 
+    public function _password_anterior_correcto($password_anterior, $id)
+    {
+        $valores = $this->Usuario->password($id);
+        if (password_verify($password_anterior, $valores['password']) === TRUE)
+        {
+            return TRUE;
+        }
+        else
+        {
+            $this->form_validation->set_message('_password_anterior_correcto',
+                'La {field} no es correcta.');
+            return FALSE;
+        }
+    }
+
+    public function _nick_unico($nick, $id)
+    {
+        $res = $this->Usuario->por_nick($nick);
+
+        if ($res === FALSE || $res['id'] === $id)
+        {
+            return TRUE;
+        }
+        else
+        {
+            $this->form_validation->set_message('_nick_unico',
+                'El {field} debe ser único.');
+            return FALSE;
+        }
+    }
+
     private function limpiar($accion, $valores)
     {
         unset($valores[$accion]);
         $valores['password'] = password_hash($valores['password'], PASSWORD_DEFAULT);
         unset($valores['password_confirm']);
-
+        if (isset($valores['password_anterior']))
+        {
+            unset($valores['password_anterior']);
+        }
         return $valores;
     }
 }
