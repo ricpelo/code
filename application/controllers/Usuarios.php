@@ -50,6 +50,8 @@ class Usuarios extends CI_Controller
                 redirect('articulos/index');
             }
         }
+
+        // $this->output->enable_profiler(TRUE);
     }
 
     public function login()

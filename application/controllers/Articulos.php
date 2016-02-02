@@ -41,6 +41,7 @@ class Articulos extends CI_Controller
 
     public function index()
     {
+        $this->output->cache(10);
         $data['filas'] = $this->Articulo->todos();
         $this->template->load('articulos/index', $data);
     }
@@ -56,6 +57,7 @@ class Articulos extends CI_Controller
             {
                 $valores = $this->limpiar('insertar', $this->input->post());
                 $this->Articulo->insertar($valores);
+                $this->output->delete_cache('/articulos/index');
                 redirect('articulos/index');
             }
         }
@@ -80,6 +82,7 @@ class Articulos extends CI_Controller
             {
                 $valores = $this->limpiar('editar', $this->input->post());
                 $this->Articulo->editar($valores, $id);
+                $this->output->delete_cache('/articulos/index');
                 redirect('articulos/index');
             }
         }
@@ -100,6 +103,7 @@ class Articulos extends CI_Controller
             if ($id !== NULL)
             {
                 $this->Articulo->borrar($id);
+                $this->output->delete_cache('/articulos/index');
             }
             redirect('articulos/index');
         }
