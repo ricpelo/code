@@ -39,8 +39,14 @@ class Usuarios extends CI_Controller
         {
             if ( ! $this->Usuario->es_admin())
             {
-                $this->session->set_flashdata('mensaje',
-                    "No tiene permisos para acceder a $accion.");
+                $mensajes = $this->session->flashdata('mensajes');
+                $mensajes = isset($mensajes) ? $mensajes : array();
+                $mensajes[] = array('error' =>
+                    "No tiene permisos para acceder a $accion");
+                $mensajes[] = array('error' =>
+                    "Esto es una prueba");
+                $this->session->set_flashdata('mensajes', $mensajes);
+
                 redirect('articulos/index');
             }
         }
