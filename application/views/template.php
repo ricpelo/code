@@ -19,7 +19,7 @@
     <body>
         <div class="container-fluid" style="padding-top: 20px">
           <?= login() ?>
-          <?= mensaje() ?>
+          <?= mensajes() ?>
           <?= $contents ?>
         </div>
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
