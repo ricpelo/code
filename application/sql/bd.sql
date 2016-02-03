@@ -10,13 +10,22 @@ create table roles (
 drop table if exists usuarios cascade;
 
 create table usuarios (
-    id       bigserial   constraint pk_usuarios primary key,
-    nick     varchar(15) not null constraint uq_usuarios_nick unique,
-    password char(60)    not null constraint ck_password_valida
-                         check (length(password) = 60),
-    rol_id   bigint      not null constraint fk_usuarios_roles
-                         references roles (id) on delete no action
-                         on update cascade
+    id       bigserial    constraint pk_usuarios primary key,
+    nick     varchar(15)  not null constraint uq_usuarios_nick unique,
+    password char(60)     not null constraint ck_password_valida
+                          check (length(password) = 60),
+    email    varchar(100) not null,
+    rol_id   bigint       not null constraint fk_usuarios_roles
+                          references roles (id) on delete no action
+                          on update cascade
+);
+
+drop table if exists tokens cascade;
+
+create table tokens (
+    usuario_id bigint   constraint pk_tokens primary key
+                        constraint fk_tokens_usuarios references usuarios (id),
+    token      char(32) not null
 );
 
 drop view if exists usuarios_roles cascade;

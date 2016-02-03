@@ -9,12 +9,13 @@
 
 -- USUARIOS --
 
-    insert into usuarios (nick, password, rol_id)
-                         values ('admin', crypt('admin', gen_salt('bf')), 1),
-                                ('roberto', crypt('roberto', gen_salt('bf')), 2),
-                                ('pepe', crypt('pepe', gen_salt('bf')), 2),
-                                ('juan', crypt('juan', gen_salt('bf')), 2),
-                                ('maria', crypt('maria', gen_salt('bf')), 2);
+insert into usuarios (nick, password, email, rol_id)
+values ('admin', crypt('admin', gen_salt('bf')), 'ricardo@iesdonana.org', 1),
+    ('roberto', crypt('roberto', gen_salt('bf')), 'ricardo@iesdonana.org', 2),
+    ('pepe', crypt('pepe', gen_salt('bf')), 'ricardo@iesdonana.org', 2),
+    ('juan', crypt('juan', gen_salt('bf')), 'ricardo@iesdonana.org', 2),
+    ('maria', crypt('maria', gen_salt('bf')), 'ricardo@iesdonana.org', 2),
+    ('ricardo', crypt('ricardo', gen_salt('bf')), 'ricardo@iesdonana.org', 2);
 
 
 -- ARTICULOS --

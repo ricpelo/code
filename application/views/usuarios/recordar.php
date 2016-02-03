@@ -1,4 +1,4 @@
-<?php template_set('title', 'Login') ?>
+<?php template_set('title', 'Recordar contraseña') ?>
 <div class="row">
   <div class="col-md-4 col-md-offset-4">
     <div class="panel panel-primary">
@@ -11,19 +11,15 @@
             <?= validation_errors() ?>
           </div>
         <?php endif ?>
-        <?= form_open('usuarios/login') ?>
+        <?= form_open('usuarios/recordar') ?>
           <div class="form-group">
             <?= form_label('Nick:', 'nick') ?>
             <?= form_input('nick', set_value('nick', '', FALSE),
                            'id="nick" class="form-control"') ?>
           </div>
-          <div class="form-group">
-            <?= form_label('Contraseña:', 'password') ?>
-            <?= form_password('password', '',
-                              'id="password" class="form-control"') ?>
-          </div>
-          <?= form_submit('login', 'Login', 'class="btn btn-success"') ?>
-          <?= anchor('/usuarios/recordar', 'Recordar contraseña',
+          <?= form_submit('recordar', 'Recordar contraseña',
+                          'class="btn btn-success"') ?>
+          <?= anchor('/usuarios/login', 'Volver',
                      'class="btn btn-info" role="button"') ?>
         <?= form_close() ?>
       </div>
