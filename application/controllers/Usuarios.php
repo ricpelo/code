@@ -36,12 +36,13 @@ class Usuarios extends CI_Controller
         parent::__construct();
         $accion = $this->uri->rsegment(2);
 
-        if ($accion !== 'login' && ! $this->Usuario->logueado())
+        if ( ! in_array($accion, array('login', 'recordar')) &&
+             ! $this->Usuario->logueado())
         {
             redirect('usuarios/login');
         }
 
-        if ( ! in_array($accion, array('login', 'logout')))
+        if ( ! in_array($accion, array('login', 'logout', 'recordar')))
         {
             if ( ! $this->Usuario->es_admin())
             {
@@ -109,6 +110,51 @@ class Usuarios extends CI_Controller
     {
         $this->session->sess_destroy();
         redirect('usuarios/login');
+    }
+
+    public function recordar()
+    {
+        if ($this->input->post('recordar') !== NULL)
+        {
+            $reglas = array(
+                array(
+                    'field' => 'nick',
+                    'label' => 'Nick',
+                    'rules' => array(
+                        'trim',
+                        'required',
+                        array('existe_usuario', array($this->Usuario, 'existe_nick'))
+                    ),
+                    'errors' => array(
+                        'existe_usuario' => 'Ese usuario no existe.'
+                    )
+                )
+            );
+            $this->form_validation->set_rules($reglas);
+            if ($this->form_validation->run() !== FALSE)
+            {
+                // Preparar correo
+                $nick = $this->input->post('nick');
+                $usuario = $this->Usuario->por_nick($nick);
+                $usuario_id = $usuario['id'];
+                $this->load->model('Token');
+                $enlace = anchor('/usuarios/regenerar/' . $usuario_id . '/' .
+                                 $this->Token->generar($usuario_id));
+                $this->load->library('email');
+                $this->email->from('iesdonana2daw@gmail.com');
+                $this->email->to($usuario['email']);
+                $this->email->subject('Regeneración de contraseña');
+                $this->email->message($enlace);
+                $this->email->send();
+                $mensajes = $this->session->flashdata('mensajes');
+                $mensajes = isset($mensajes) ? $mensajes : array();
+                $mensajes[] = array('info' =>
+                    "Se ha enviado un correo a su dirección de email.");
+                $this->session->set_flashdata('mensajes', $mensajes);
+                redirect('usuarios/login');
+            }
+        }
+        $this->template->load('usuarios/recordar');
     }
 
     public function index()
