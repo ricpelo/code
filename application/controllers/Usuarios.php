@@ -36,13 +36,13 @@ class Usuarios extends CI_Controller
         parent::__construct();
         $accion = $this->uri->rsegment(2);
 
-        if ( ! in_array($accion, array('login', 'recordar')) &&
+        if ( ! in_array($accion, array('login', 'recordar', 'regenerar')) &&
              ! $this->Usuario->logueado())
         {
             redirect('usuarios/login');
         }
 
-        if ( ! in_array($accion, array('login', 'logout', 'recordar')))
+        if ( ! in_array($accion, array('login', 'logout', 'recordar', 'regenerar')))
         {
             if ( ! $this->Usuario->es_admin())
             {
@@ -155,6 +155,57 @@ class Usuarios extends CI_Controller
             }
         }
         $this->template->load('usuarios/recordar');
+    }
+
+    public function regenerar($usuario_id = NULL, $token = NULL)
+    {
+        if ($usuario_id === NULL || $token === NULL)
+        {
+            redirect('usuarios/login');
+        }
+
+        $this->load->model('Token');
+
+        if ($this->Token->comprobar($usuario_id, $token) === TRUE)
+        {
+            $data['usuario_id'] = $usuario_id;
+            $data['token'] = $token;
+            if ($this->input->post('regenerar') !== NULL)
+            {
+                $reglas = array(
+                    array(
+                        'field' => 'password',
+                        'label' => 'Contraseña',
+                        'rules' => 'trim|required'
+                    ),
+                    array(
+                        'field' => 'password_confirm',
+                        'label' => 'Confirmar contraseña',
+                        'rules' => 'trim|required|matches[password]'
+                    )
+                );
+                $this->form_validation->set_rules($reglas);
+                if ($this->form_validation->run() !== FALSE)
+                {
+                    $password = password_hash($this->input->post('password'),
+                                              PASSWORD_DEFAULT);
+                    $this->Usuario->editar(array('password' => $password),
+                                           $usuario_id);
+                    $this->Token->borrar($usuario_id);
+                    $mensajes = $this->session->flashdata('mensajes');
+                    $mensajes = isset($mensajes) ? $mensajes : array();
+                    $mensajes[] = array('info' =>
+                        "Contraseña cambiada correctamente.");
+                    $this->session->set_flashdata('mensajes', $mensajes);
+                    redirect('usuarios/login');
+                }
+            }
+            $this->template->load('usuarios/regenerar', $data);
+        }
+        else
+        {
+            redirect('usuarios/login');
+        }
     }
 
     public function index()

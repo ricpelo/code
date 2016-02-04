@@ -20,8 +20,8 @@ class Token extends CI_Model
             }
             else
             {
-                $this->db->where('usuario_id',
-                     $usuario_id)->update('tokens', array('token' => $nuevo_token));
+                $this->db->where('usuario_id', $usuario_id)->
+                    update('tokens', array('token' => $nuevo_token));
             }
             return $nuevo_token;
         }
