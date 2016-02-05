@@ -46,13 +46,9 @@ class Usuarios extends CI_Controller
         {
             if ( ! $this->Usuario->es_admin())
             {
-                $mensajes = $this->session->flashdata('mensajes');
-                $mensajes = isset($mensajes) ? $mensajes : array();
                 $mensajes[] = array('error' =>
-                    "No tiene permisos para acceder a $accion");
-                $mensajes[] = array('error' =>
-                    "Esto es una prueba");
-                $this->session->set_flashdata('mensajes', $mensajes);
+                    "No tiene permisos para estar en el index de usuarios.");
+                $this->flashdata->load($mensajes);
 
                 redirect('articulos/index');
             }
@@ -146,11 +142,11 @@ class Usuarios extends CI_Controller
                 $this->email->subject('Regeneración de contraseña');
                 $this->email->message($enlace);
                 $this->email->send();
-                $mensajes = $this->session->flashdata('mensajes');
-                $mensajes = isset($mensajes) ? $mensajes : array();
+
                 $mensajes[] = array('info' =>
                     "Se ha enviado un correo a su dirección de email.");
-                $this->session->set_flashdata('mensajes', $mensajes);
+                $this->flashdata->load($mensajes);
+
                 redirect('usuarios/login');
             }
         }
@@ -192,11 +188,11 @@ class Usuarios extends CI_Controller
                     $this->Usuario->editar(array('password' => $password),
                                            $usuario_id);
                     $this->Token->borrar($usuario_id);
-                    $mensajes = $this->session->flashdata('mensajes');
-                    $mensajes = isset($mensajes) ? $mensajes : array();
+
                     $mensajes[] = array('info' =>
-                        "Contraseña cambiada correctamente.");
-                    $this->session->set_flashdata('mensajes', $mensajes);
+                        "Su contraseña se ha regenerado correctamente.");
+                    $this->flashdata->load($mensajes);
+
                     redirect('usuarios/login');
                 }
             }
@@ -204,6 +200,10 @@ class Usuarios extends CI_Controller
         }
         else
         {
+            $mensajes[] = array('error' =>
+                "Información no valida para la regeneración de la contraseña. Por favor, vuelva a intentarlo.");
+            $this->flashdata->load($mensajes);
+            
             redirect('usuarios/login');
         }
     }

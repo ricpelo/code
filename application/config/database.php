@@ -74,7 +74,7 @@ $active_group = 'default';
 $query_builder = TRUE;
 
 $db['default'] = array(
-	'dsn'   => 'postgresql://tienda:tienda@localhost/tienda',
+	'dsn'   => 'postgresql://usuario:usuario@localhost/datos',
 	'hostname' => '',
 	'username' => '',
 	'password' => '',
