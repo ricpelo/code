@@ -6,7 +6,7 @@
         <h3 class="panel-title">Insertar usuario</h3>
       </div>
       <div class="panel-body">
-        <?php if ( ! empty(error_array())): ?>
+        <?php if (count(error_array()) > 0): ?>
           <div class="alert alert-danger" role="alert">
             <?= validation_errors() ?>
           </div>
